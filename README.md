@@ -1,10 +1,17 @@
 # Своя игра
 
+### Для работы необходим сервер
+
+Ссылка - [MyGame-Backend](https://github.com/Palldanerar/MyGame-Backend)
+
 ### Стек технологий
 
 - React
 - TypeScript
 - tailwindCSS
+- react-router-dom
+- react-hot-toast
+- socket.io-client
 
 ### Пример данных для игры
 

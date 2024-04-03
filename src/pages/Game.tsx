@@ -1,29 +1,35 @@
-import React, { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { IUser } from '../interface/IUser'
 import { IGame } from '../interface/IGame'
 import { IQuestion } from '../interface/IQuestion'
-import { dataUsers } from '../users'
 import { dataGame } from '../game'
 import { ITopic } from '../interface/ITopic'
+import { io } from 'socket.io-client'
+import { useLocation } from 'react-router-dom'
 
 const Game = () => {
 
-    // Временная переменная, чтобы включить дизайн для игрока
-    const client = false
+    const socket = io("http://localhost:3800");
+    const location = useLocation();
 
-    const [users, setUsers] = useState<IUser[]>(dataUsers)
+    const [user, setUser] = useState<IUser>({
+        username: location.state?.username,
+        role: location.state?.role,
+        points: location.state?.points,
+    })
+    const [users, setUsers] = useState<IUser[]>()
     const [game, setGame] = useState<IGame>(dataGame)
 
     const [selectedQuestion, setSelectedQuestion] = useState<IQuestion | null>(null)
-    const [activeUser, setActiveUser] = useState<IUser>(users[0])
+    const [activeUser, setActiveUser] = useState<IUser>()
 
     const [isSelect, setIsSelect] = useState(false)
     const [isAnswer, setIsAnswer] = useState(false)
 
     const [isUser, setIsUser] = useState(false)
 
+    // Функции для работы с клиентом
     const showQuestion = (question: IQuestion) => {
-
         question.isHidden = true;
         setIsSelect(true)
         setSelectedQuestion(question)
@@ -40,33 +46,70 @@ const Game = () => {
         setIsAnswer(true)
     }
 
+    // Функции для работы с сервером
     const addPointUser = () => {
-        // @ts-ignore 
-        activeUser.points += selectedQuestion?.points
+        socket.emit("addPoints", { activeUser, points: selectedQuestion?.points })
 
-        changeUser()
         hiddenQuestion()
     }
 
     const changeUser = () => {
-        let index = users.indexOf(activeUser) + 1
-        if (index == users.length) {
-            index = 0
-            setActiveUser(users[index])
-            return
-        }
 
-        setActiveUser(users[index])
+        console.log(1)
+
+        socket.emit("changeUser")
+
+        socket.on("newActiveUser", (user) => {
+            console.log(user)
+            setActiveUser(user)
+        })
+
     }
 
-    if (client) {
+    useEffect(() => {
+        socket.emit("join", {
+            username: location.state?.username,
+            role: location.state?.role,
+            points: location.state?.points,
+        })
+    }, [])
+
+    socket.on("getActiveUser", (user) => {
+        console.log(user)
+        setActiveUser(user)
+    })
+
+    socket.on("all", (users) => {
+        setUsers(users)
+    })
+
+    socket.on("newUserList", (users) => {
+        if (user.role == "user") {
+            const newData = users?.find((el: IUser) => el.username == user.username)
+            setUser(newData)
+        }
+
+        setUsers(users)
+    })
+
+    if (user.role == "user") {
         return (
             <div className='w-full h-screen flex justify-center items-center bg-slate-300'>
                 <div className='bg-white rounded-lg p-4 flex flex-col gap-y-3 items-center'>
                     <h2 className='text-2xl text-center text-wrap'>{selectedQuestion ? selectedQuestion?.question : "Вопрос ещё не выбран"}</h2>
-                    <h2 className='text-center text-xl'>{activeUser.username}</h2>
-                    <h2 className='text-center text-xl'>Очки: {activeUser.points}</h2>
+                    <h2 className='text-center text-xl'>{user.username}</h2>
+                    <h2 className='text-center text-xl'>Очки: {user.points}</h2>
                     <button className='w-40 h-40 rounded-full text-2xl bg-green-300 p-2'>Ответить</button>
+                    <div className="w-full flex flex-col items-center gap-y-3">
+                        {// @ts-ignore
+                            users && [...users]?.sort((a, b) => b.points - a.points).map((user) => (
+                                <div className="w-[600px] drop-shadow-lg border-2 flex justify-between p-3 rounded-lg">
+                                    <h2>Имя: {user.username}</h2>
+                                    <h2>Очки: {user.points}</h2>
+                                </div>
+                            ))
+                        }
+                    </div>
                 </div>
             </div>
         )
@@ -86,8 +129,8 @@ const Game = () => {
                         </div>
                         {isAnswer && <div className="flex flex-col gap-y-3">
                             <p className="italic">{selectedQuestion?.answer}</p>
-                            <button className="w-full p-2 bg-green-300 rounded-lg" onClick={addPointUser}>Добавить очки {activeUser.username}</button>
-                            <button className="w-full p-2 bg-red-300 rounded-lg" onClick={hiddenQuestion}>Ответ не засчитан</button>
+                            <button className="w-full p-2 bg-green-300 rounded-lg" onClick={addPointUser}>Добавить очки {activeUser?.username}</button>
+                            <button className="w-full p-2 bg-red-300 rounded-lg" onClick={changeUser}>Перейти к другому игроку</button>
                         </div>}
                     </div>
                 </div>
@@ -125,12 +168,14 @@ const Game = () => {
                     ))
                     :
                     <div className="w-full flex flex-col items-center gap-y-3">
-                        {[...users].sort((a, b) => b.points - a.points).map((user) => (
-                            <div className="w-[600px] drop-shadow-lg border-2 flex justify-between p-3 rounded-lg">
-                                <h2>Имя: {user.username}</h2>
-                                <h2>Очки: {user.points}</h2>
-                            </div>
-                        ))}
+                        {// @ts-ignore
+                            users && [...users]?.sort((a, b) => b.points - a.points).map((user) => (
+                                <div className="w-[600px] drop-shadow-lg border-2 flex justify-between p-3 rounded-lg">
+                                    <h2>Имя: {user.username}</h2>
+                                    <h2>Очки: {user.points}</h2>
+                                </div>
+                            ))
+                        }
                     </div>
                 }
             </div>
