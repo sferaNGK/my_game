@@ -18,10 +18,11 @@ const Game = () => {
         points: location.state?.points,
     })
     const [users, setUsers] = useState<IUser[]>()
+    const [queue, setQueue] = useState<IUser[]>([])
     const [game, setGame] = useState<IGame>(dataGame)
 
     const [selectedQuestion, setSelectedQuestion] = useState<IQuestion | null>(null)
-    const [activeUser, setActiveUser] = useState<IUser>()
+    const [activeUser, setActiveUser] = useState<IUser | null>()
 
     const [isSelect, setIsSelect] = useState(false)
     const [isAnswer, setIsAnswer] = useState(false)
@@ -30,6 +31,7 @@ const Game = () => {
 
     // Функции для работы с клиентом
     const showQuestion = (question: IQuestion) => {
+        socket.emit("selectQuestion", question)
         question.isHidden = true;
         setIsSelect(true)
         setSelectedQuestion(question)
@@ -53,21 +55,21 @@ const Game = () => {
         hiddenQuestion()
     }
 
+    const answerQuestion = () => {
+
+        if (!selectedQuestion) {
+            return
+        }
+
+        socket.emit("answerQuestion", user)
+    }
+
     const changeUser = () => {
-
-        console.log(1)
-
         socket.emit("changeUser")
-
-        socket.on("newActiveUser", (user) => {
-            console.log(user)
-            setActiveUser(user)
-        })
-
     }
 
     useEffect(() => {
-        socket.emit("join", {
+        socket.emit("joinGame", {
             username: location.state?.username,
             role: location.state?.role,
             points: location.state?.points,
@@ -89,7 +91,28 @@ const Game = () => {
             setUser(newData)
         }
 
+        setSelectedQuestion(null)
+
+        console.log(selectedQuestion)
+
+        setActiveUser(null)
+        setQueue([])
         setUsers(users)
+    })
+
+    socket.on("setActiveQuestion", (activeQuestion) => {
+        setSelectedQuestion(activeQuestion)
+    })
+
+    socket.on("getQueue", (userQueue) => {
+
+        console.log(queue)
+
+        setQueue(userQueue)
+    })
+
+    socket.on("newActiveUser", (user) => {
+        setActiveUser(user)
     })
 
     if (user.role == "user") {
@@ -99,11 +122,23 @@ const Game = () => {
                     <h2 className='text-2xl text-center text-wrap'>{selectedQuestion ? selectedQuestion?.question : "Вопрос ещё не выбран"}</h2>
                     <h2 className='text-center text-xl'>{user.username}</h2>
                     <h2 className='text-center text-xl'>Очки: {user.points}</h2>
-                    <button className='w-40 h-40 rounded-full text-2xl bg-green-300 p-2'>Ответить</button>
+                    <button onClick={answerQuestion} className='w-40 h-40 rounded-full text-2xl bg-green-300 p-2'>Ответить</button>
+                    <div className="w-full flex flex-col items-center gap-y-3">
+                        <h2>Очередь на ответ</h2>
+                        {// @ts-ignore
+                            queue && [...queue]?.map((user) => (
+                                <div key={user.username} className="w-[600px] drop-shadow-lg border-2 flex justify-between p-3 rounded-lg">
+                                    <h2>Имя: {user.username}</h2>
+                                    <h2>Очки: {user.points}</h2>
+                                </div>
+                            ))
+                        }
+                    </div>
+                    <hr />
                     <div className="w-full flex flex-col items-center gap-y-3">
                         {// @ts-ignore
                             users && [...users]?.sort((a, b) => b.points - a.points).map((user) => (
-                                <div className="w-[600px] drop-shadow-lg border-2 flex justify-between p-3 rounded-lg">
+                                <div key={user.username} className="w-[600px] drop-shadow-lg border-2 flex justify-between p-3 rounded-lg">
                                     <h2>Имя: {user.username}</h2>
                                     <h2>Очки: {user.points}</h2>
                                 </div>
@@ -151,7 +186,7 @@ const Game = () => {
                                 {topic.questions.map((question: IQuestion) => {
                                     if (!question.isHidden) {
                                         return (
-                                            <div onClick={() => { showQuestion(question) }} className="w-48 rounded-lg bg-slate-300 p-3 cursor-pointer">
+                                            <div onClick={() => { showQuestion(question) }} key={question.question} className="w-48 rounded-lg bg-slate-300 p-3 cursor-pointer">
                                                 <h2 className="text-center">{question.points}</h2>
                                             </div>
                                         )
@@ -170,7 +205,7 @@ const Game = () => {
                     <div className="w-full flex flex-col items-center gap-y-3">
                         {// @ts-ignore
                             users && [...users]?.sort((a, b) => b.points - a.points).map((user) => (
-                                <div className="w-[600px] drop-shadow-lg border-2 flex justify-between p-3 rounded-lg">
+                                <div key={user.username} className="w-[600px] drop-shadow-lg border-2 flex justify-between p-3 rounded-lg">
                                     <h2>Имя: {user.username}</h2>
                                     <h2>Очки: {user.points}</h2>
                                 </div>
