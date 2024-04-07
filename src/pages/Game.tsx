@@ -16,7 +16,7 @@ const Game = () => {
         role: location.state?.role,
         points: location.state?.points,
     })
-    
+
     const [users, setUsers] = useState<IUser[]>()
     const [queue, setQueue] = useState<IUser[]>([])
     const [game, setGame] = useState<IGame>(dataGame)
@@ -76,7 +76,6 @@ const Game = () => {
         })
 
         socket.on("getActiveUser", (user) => {
-            console.log(user)
             setActiveUser(user)
         })
 
@@ -92,8 +91,6 @@ const Game = () => {
 
             setSelectedQuestion(null)
 
-            console.log(selectedQuestion)
-
             setActiveUser(null)
             setQueue([])
             setUsers(users)
@@ -104,9 +101,6 @@ const Game = () => {
         })
 
         socket.on("getQueue", (userQueue) => {
-
-            console.log(queue)
-
             setQueue(userQueue)
         })
 
