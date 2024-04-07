@@ -4,12 +4,11 @@ import { IGame } from '../interface/IGame'
 import { IQuestion } from '../interface/IQuestion'
 import { dataGame } from '../game'
 import { ITopic } from '../interface/ITopic'
-import { io } from 'socket.io-client'
 import { useLocation } from 'react-router-dom'
+import { socket } from '../socket'
 
 const Game = () => {
 
-    const socket = io("http://localhost:3800");
     const location = useLocation();
 
     const [user, setUser] = useState<IUser>({
@@ -17,6 +16,7 @@ const Game = () => {
         role: location.state?.role,
         points: location.state?.points,
     })
+    
     const [users, setUsers] = useState<IUser[]>()
     const [queue, setQueue] = useState<IUser[]>([])
     const [game, setGame] = useState<IGame>(dataGame)
@@ -74,46 +74,52 @@ const Game = () => {
             role: location.state?.role,
             points: location.state?.points,
         })
+
+        socket.on("getActiveUser", (user) => {
+            console.log(user)
+            setActiveUser(user)
+        })
+
+        socket.on("all", (users) => {
+            setUsers(users)
+        })
+
+        socket.on("newUserList", (users) => {
+            if (user.role == "user") {
+                const newData = users?.find((el: IUser) => el.username == user.username)
+                setUser(newData)
+            }
+
+            setSelectedQuestion(null)
+
+            console.log(selectedQuestion)
+
+            setActiveUser(null)
+            setQueue([])
+            setUsers(users)
+        })
+
+        socket.on("setActiveQuestion", (activeQuestion) => {
+            setSelectedQuestion(activeQuestion)
+        })
+
+        socket.on("getQueue", (userQueue) => {
+
+            console.log(queue)
+
+            setQueue(userQueue)
+        })
+
+        socket.on("newActiveUser", (user) => {
+            setActiveUser(user)
+        })
+
+        return () => {
+            socket.disconnect();
+        };
+
     }, [])
 
-    socket.on("getActiveUser", (user) => {
-        console.log(user)
-        setActiveUser(user)
-    })
-
-    socket.on("all", (users) => {
-        setUsers(users)
-    })
-
-    socket.on("newUserList", (users) => {
-        if (user.role == "user") {
-            const newData = users?.find((el: IUser) => el.username == user.username)
-            setUser(newData)
-        }
-
-        setSelectedQuestion(null)
-
-        console.log(selectedQuestion)
-
-        setActiveUser(null)
-        setQueue([])
-        setUsers(users)
-    })
-
-    socket.on("setActiveQuestion", (activeQuestion) => {
-        setSelectedQuestion(activeQuestion)
-    })
-
-    socket.on("getQueue", (userQueue) => {
-
-        console.log(queue)
-
-        setQueue(userQueue)
-    })
-
-    socket.on("newActiveUser", (user) => {
-        setActiveUser(user)
-    })
 
     if (user.role == "user") {
         return (
