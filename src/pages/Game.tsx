@@ -6,6 +6,7 @@ import { dataGame } from '../game'
 import { ITopic } from '../interface/ITopic'
 import { useLocation } from 'react-router-dom'
 import { socket } from '../socket'
+import toast from 'react-hot-toast/headless'
 
 const Game = () => {
 
@@ -25,7 +26,6 @@ const Game = () => {
     const [activeUser, setActiveUser] = useState<IUser | null>()
 
     const [isSelect, setIsSelect] = useState(false)
-    const [isAnswer, setIsAnswer] = useState(false)
 
     const [isUser, setIsUser] = useState(false)
 
@@ -39,13 +39,8 @@ const Game = () => {
 
     const hiddenQuestion = () => {
         setIsSelect(false)
-        setIsAnswer(false)
         setSelectedQuestion(null)
         changeUser()
-    }
-
-    const showAnswer = () => {
-        setIsAnswer(true)
     }
 
     // Функции для работы с сервером
@@ -61,6 +56,8 @@ const Game = () => {
             return
         }
 
+        toast.success("Вы успешно добавлены в очередь")
+
         socket.emit("answerQuestion", user)
     }
 
@@ -69,6 +66,7 @@ const Game = () => {
     }
 
     useEffect(() => {
+
         socket.emit("joinGame", {
             username: location.state?.username,
             role: location.state?.role,
@@ -108,6 +106,15 @@ const Game = () => {
             setActiveUser(user)
         })
 
+        socket.on('connect', () => {
+            console.log('connected');
+        });
+
+        socket.on('disconnect', () => {
+            console.log('disconnected');
+            socket.connect();
+        });
+
         return () => {
             socket.disconnect();
         };
@@ -118,27 +125,41 @@ const Game = () => {
     if (user.role == "user") {
         return (
             <div className='w-full h-screen flex justify-center items-center bg-slate-300'>
-                <div className='bg-white rounded-lg p-4 flex flex-col gap-y-3 items-center'>
+                <div className='w-[800px] bg-white rounded-lg p-4 flex flex-col gap-y-3 items-center'>
                     <h2 className='text-2xl text-center text-wrap'>{selectedQuestion ? selectedQuestion?.question : "Вопрос ещё не выбран"}</h2>
                     <h2 className='text-center text-xl'>{user.username}</h2>
                     <h2 className='text-center text-xl'>Очки: {user.points}</h2>
-                    <button onClick={answerQuestion} className='w-40 h-40 rounded-full text-2xl bg-green-300 p-2'>Ответить</button>
+                    {
+                        selectedQuestion && <button onClick={answerQuestion} className='w-40 h-40 rounded-full text-2xl bg-green-300 p-2'>{queue.find((el: IUser) => el.username == user.username) ? "Вы уже ответили" : "Ответить"}</button>
+                    }
                     <div className="w-full flex flex-col items-center gap-y-3">
                         <h2>Очередь на ответ</h2>
-                        {// @ts-ignore
-                            queue && [...queue]?.map((user) => (
-                                <div key={user.username} className="w-[600px] drop-shadow-lg border-2 flex justify-between p-3 rounded-lg">
-                                    <h2>Имя: {user.username}</h2>
-                                    <h2>Очки: {user.points}</h2>
-                                </div>
-                            ))
+                        {
+                            queue && [...queue]?.map((user) => {
+                                if (user.username == activeUser?.username) {
+                                    return (
+                                        <div key={user.username} className="w-full drop-shadow-lg border-2 flex bg-green-100 justify-between p-3 rounded-lg">
+                                            <h2>Имя: {user.username}</h2>
+                                            <h2>Очки: {user.points}</h2>
+                                        </div>
+                                    )
+                                }
+
+                                return (
+                                    <div key={user.username} className="w-full drop-shadow-lg border-2 flex justify-between p-3 rounded-lg">
+                                        <h2>Имя: {user.username}</h2>
+                                        <h2>Очки: {user.points}</h2>
+                                    </div>
+                                )
+
+                            })
                         }
                     </div>
                     <hr />
                     <div className="w-full flex flex-col items-center gap-y-3">
                         {// @ts-ignore
                             users && [...users]?.sort((a, b) => b.points - a.points).map((user) => (
-                                <div key={user.username} className="w-[600px] drop-shadow-lg border-2 flex justify-between p-3 rounded-lg">
+                                <div key={user.username} className="w-full drop-shadow-lg border-2 flex justify-between p-3 rounded-lg">
                                     <h2>Имя: {user.username}</h2>
                                     <h2>Очки: {user.points}</h2>
                                 </div>
@@ -157,16 +178,36 @@ const Game = () => {
                 <div className='absolute w-full h-screen bg-slate-500 z-10 flex justify-center items-center text-lg'>
                     <div className="w-[600px] bg-white p-4 rounded-lg flex flex-col gap-y-3">
                         <div>
-                            <h2 className='text-wrap'>{selectedQuestion?.question}</h2>
+                            <h2 className='text-wrap text-center'>{selectedQuestion?.question}</h2>
                         </div>
-                        <div>
-                            <button onClick={showAnswer}>Показать ответ</button>
+                        <div className='flex flex-col gap-y-3'>
+                            {
+                                queue && [...queue]?.map((user) => {
+                                    if (user.username == activeUser?.username) {
+                                        return (
+                                            <div key={user.username} className="w-full drop-shadow-lg border-2 flex bg-green-100 justify-between p-3 rounded-lg">
+                                                <h2>Имя: {user.username}</h2>
+                                                <h2>Очки: {user.points}</h2>
+                                            </div>
+                                        )
+                                    }
+
+                                    return (
+                                        <div key={user.username} className="w-full drop-shadow-lg border-2 flex justify-between p-3 rounded-lg">
+                                            <h2>Имя: {user.username}</h2>
+                                            <h2>Очки: {user.points}</h2>
+                                        </div>
+                                    )
+
+                                })
+                            }
+                            {queue.length != 0 &&
+                                <div className='flex flex-col gap-y-3'>
+                                    <button className="w-full p-2 bg-green-300 rounded-lg" onClick={addPointUser}>Добавить очки {activeUser?.username}</button>
+                                    <button className="w-full p-2 bg-red-300 rounded-lg" onClick={changeUser}>Перейти к другому игроку</button>
+                                </div>
+                            }
                         </div>
-                        {isAnswer && <div className="flex flex-col gap-y-3">
-                            <p className="italic">{selectedQuestion?.answer}</p>
-                            <button className="w-full p-2 bg-green-300 rounded-lg" onClick={addPointUser}>Добавить очки {activeUser?.username}</button>
-                            <button className="w-full p-2 bg-red-300 rounded-lg" onClick={changeUser}>Перейти к другому игроку</button>
-                        </div>}
                     </div>
                 </div>
             }
