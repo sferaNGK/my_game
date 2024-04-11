@@ -1,6 +1,6 @@
 export interface IQuestion {
     question: string,
-    answer: string | number,
+    answer: string,
     points: number,
     isHidden: boolean,
 }

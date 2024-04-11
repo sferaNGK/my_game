@@ -1,6 +1,7 @@
 import { IGame } from "./interface/IGame";
 
 export const dataGame: IGame = {
+    id: "12",
     title: "Россия",
     topics: [
         {
@@ -20,7 +21,7 @@ export const dataGame: IGame = {
                 },
                 {
                     question: "Сколько среди регионов России автономных округов?",
-                    answer: 4,
+                    answer: "4",
                     points: 300,
                     isHidden: false,
                 },

@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react'
 import { IUser } from '../interface/IUser'
 import { IGame } from '../interface/IGame'
 import { IQuestion } from '../interface/IQuestion'
-import { dataGame } from '../game'
 import { ITopic } from '../interface/ITopic'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import { socket } from '../socket'
 import toast from 'react-hot-toast/headless'
+import axios from 'axios'
 
 const Game = () => {
 
@@ -20,7 +20,7 @@ const Game = () => {
 
     const [users, setUsers] = useState<IUser[]>()
     const [queue, setQueue] = useState<IUser[]>([])
-    const [game, setGame] = useState<IGame>(dataGame)
+    const [game, setGame] = useState<IGame>()
 
     const [selectedQuestion, setSelectedQuestion] = useState<IQuestion | null>(null)
     const [activeUser, setActiveUser] = useState<IUser | null>()
@@ -65,7 +65,15 @@ const Game = () => {
         socket.emit("changeUser")
     }
 
+    const getGameData = async () => {
+        const response = await axios.get(`http://localhost:3800/game/${localStorage.getItem("id")}`)
+        const data = JSON.parse(response.data.gamedata)
+        setGame(data)
+    }
+
     useEffect(() => {
+
+        getGameData()
 
         socket.emit("joinGame", {
             username: location.state?.username,
@@ -213,12 +221,12 @@ const Game = () => {
             }
 
             <div className="w-full h-auto flex justify-between border-2 p-4">
-                <h1 className="text-2xl">{game.title}</h1>
+                <h1 className="text-2xl">{game?.title}</h1>
                 <button onClick={() => { setIsUser(!isUser) }}>Таблица</button>
             </div>
             <div className="w-full flex-auto flex flex-col justify-between p-4">
-                {!isUser ?
-                    game.topics.map((topic: ITopic) => (
+                {!isUser && game ?
+                    game?.topics.map((topic: ITopic) => (
                         <div className="flex text-2xl items-center">
                             <div className="w-64">
                                 <h2>{topic.title}</h2>
