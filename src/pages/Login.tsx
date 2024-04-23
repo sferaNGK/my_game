@@ -36,6 +36,7 @@ const Login = () => {
             toast.error('Напишите username');
             return;
         }
+        
 
         navigate(`/game`, {
             state: {
@@ -48,12 +49,7 @@ const Login = () => {
 
     const createRootm = () => {
 
-        if (!id) {
-            toast.error('Выберите игру');
-            return;
-        }
-
-        localStorage.setItem("id", id)
+        localStorage.setItem("gamedata", JSON.stringify(selectedCategories))
 
         navigate(`/game`, {
             state: {

@@ -3,12 +3,16 @@ import { IUser } from '../interface/IUser'
 import { IGame } from '../interface/IGame'
 import { IQuestion } from '../interface/IQuestion'
 import { ITopic } from '../interface/ITopic'
-import { useLocation, useParams } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import { socket } from '../socket'
 import toast from 'react-hot-toast/headless'
-import axios from 'axios'
+import { dataGame } from '../game'
 
 const Game = () => {
+
+    window.addEventListener('beforeunload', (event) => {
+        event.preventDefault();
+    });
 
     const location = useLocation();
 
@@ -20,7 +24,7 @@ const Game = () => {
 
     const [users, setUsers] = useState<IUser[]>()
     const [queue, setQueue] = useState<IUser[]>([])
-    const [game, setGame] = useState<IGame>()
+    const [game, setGame] = useState<IGame>(dataGame)
 
     const [selectedQuestion, setSelectedQuestion] = useState<IQuestion | null>(null)
     const [activeUser, setActiveUser] = useState<IUser | null>()
@@ -65,15 +69,14 @@ const Game = () => {
         socket.emit("changeUser")
     }
 
-    const getGameData = async () => {
-        const response = await axios.get(`http://localhost:3800/game/${localStorage.getItem("id")}`)
-        const data = JSON.parse(response.data.gamedata)
-        setGame(data)
-    }
+    // const getGameData = () => {
+
+    //     // @ts-ignore
+    //     const data = JSON.parse(localStorage.getItem("gamedata"))
+    //     setGame(data)
+    // }
 
     useEffect(() => {
-
-        getGameData()
 
         socket.emit("joinGame", {
             username: location.state?.username,
@@ -132,7 +135,7 @@ const Game = () => {
 
     if (user.role == "user") {
         return (
-            <div className='w-full h-screen flex justify-center items-center bg-slate-300'>
+            <div className='w-full h-screen flex justify-center items-center bg-slate-300 p-2'>
                 <div className='w-[800px] bg-white rounded-lg p-4 flex flex-col gap-y-3 items-center'>
                     <h2 className='text-2xl text-center text-wrap'>{selectedQuestion ? selectedQuestion?.question : "Вопрос ещё не выбран"}</h2>
                     <h2 className='text-center text-xl'>{user.username}</h2>
@@ -140,40 +143,6 @@ const Game = () => {
                     {
                         selectedQuestion && <button onClick={answerQuestion} className='w-40 h-40 rounded-full text-2xl bg-green-300 p-2'>{queue.find((el: IUser) => el.username == user.username) ? "Вы уже ответили" : "Ответить"}</button>
                     }
-                    <div className="w-full flex flex-col items-center gap-y-3">
-                        <h2>Очередь на ответ</h2>
-                        {
-                            queue && [...queue]?.map((user) => {
-                                if (user.username == activeUser?.username) {
-                                    return (
-                                        <div key={user.username} className="w-full drop-shadow-lg border-2 flex bg-green-100 justify-between p-3 rounded-lg">
-                                            <h2>Имя: {user.username}</h2>
-                                            <h2>Очки: {user.points}</h2>
-                                        </div>
-                                    )
-                                }
-
-                                return (
-                                    <div key={user.username} className="w-full drop-shadow-lg border-2 flex justify-between p-3 rounded-lg">
-                                        <h2>Имя: {user.username}</h2>
-                                        <h2>Очки: {user.points}</h2>
-                                    </div>
-                                )
-
-                            })
-                        }
-                    </div>
-                    <hr />
-                    <div className="w-full flex flex-col items-center gap-y-3">
-                        {// @ts-ignore
-                            users && [...users]?.sort((a, b) => b.points - a.points).map((user) => (
-                                <div key={user.username} className="w-full drop-shadow-lg border-2 flex justify-between p-3 rounded-lg">
-                                    <h2>Имя: {user.username}</h2>
-                                    <h2>Очки: {user.points}</h2>
-                                </div>
-                            ))
-                        }
-                    </div>
                 </div>
             </div>
         )
@@ -212,7 +181,11 @@ const Game = () => {
                             {queue.length != 0 &&
                                 <div className='flex flex-col gap-y-3'>
                                     <button className="w-full p-2 bg-green-300 rounded-lg" onClick={addPointUser}>Добавить очки {activeUser?.username}</button>
-                                    <button className="w-full p-2 bg-red-300 rounded-lg" onClick={changeUser}>Перейти к другому игроку</button>
+                                    <button className="w-full p-2 bg-yellow-300 rounded-lg" onClick={changeUser}>Перейти к другому игроку</button>
+                                    <button className="w-full p-2 bg-red-300 rounded-lg" onClick={() => {
+                                        socket.emit("addPoints", { activeUser, points: 0 })
+                                        hiddenQuestion()
+                                    }}>Никому</button>
                                 </div>
                             }
                         </div>
@@ -221,11 +194,11 @@ const Game = () => {
             }
 
             <div className="w-full h-auto flex justify-between border-2 p-4">
-                <h1 className="text-2xl">{game?.title}</h1>
+                <h1 className="text-2xl">Своя игра</h1>
                 <button onClick={() => { setIsUser(!isUser) }}>Таблица</button>
             </div>
             <div className="w-full flex-auto flex flex-col justify-between p-4">
-                {!isUser && game ?
+                {!isUser ?
                     game?.topics.map((topic: ITopic) => (
                         <div className="flex text-2xl items-center">
                             <div className="w-64">
@@ -233,6 +206,7 @@ const Game = () => {
                             </div>
                             <div className="w-full flex justify-between">
                                 {topic.questions.map((question: IQuestion) => {
+
                                     if (!question.isHidden) {
                                         return (
                                             <div onClick={() => { showQuestion(question) }} key={question.question} className="w-48 rounded-lg bg-slate-300 p-3 cursor-pointer">
