@@ -16,11 +16,7 @@ const Game = () => {
 
     const location = useLocation();
 
-    const [user, setUser] = useState<IUser>({
-        username: location.state?.username,
-        role: location.state?.role,
-        points: location.state?.points,
-    })
+    const [user, setUser] = useState<IUser | null>(null)
 
     const [users, setUsers] = useState<IUser[]>()
     const [queue, setQueue] = useState<IUser[]>([])
@@ -76,6 +72,21 @@ const Game = () => {
     //     setGame(data)
     // }
 
+    socket.on("newUserList", (users) => {
+
+        if (user?.role == "user") {
+            console.log(1)
+            const newData = users?.find((el: IUser) => el.username == user.username)
+            setUser(newData)
+        }
+
+        setSelectedQuestion(null)
+
+        setActiveUser(null)
+        setQueue([])
+        setUsers(users)
+    })
+
     useEffect(() => {
 
         socket.emit("joinGame", {
@@ -84,24 +95,15 @@ const Game = () => {
             points: location.state?.points,
         })
 
+        socket.on("myUser", (user) => {
+            setUser(user)
+        })
+
         socket.on("getActiveUser", (user) => {
             setActiveUser(user)
         })
 
         socket.on("all", (users) => {
-            setUsers(users)
-        })
-
-        socket.on("newUserList", (users) => {
-            if (user.role == "user") {
-                const newData = users?.find((el: IUser) => el.username == user.username)
-                setUser(newData)
-            }
-
-            setSelectedQuestion(null)
-
-            setActiveUser(null)
-            setQueue([])
             setUsers(users)
         })
 
@@ -133,15 +135,15 @@ const Game = () => {
     }, [])
 
 
-    if (user.role == "user") {
+    if (user?.role == "user") {
         return (
             <div className='w-full h-screen flex justify-center items-center bg-slate-300 p-2'>
                 <div className='w-[800px] bg-white rounded-lg p-4 flex flex-col gap-y-3 items-center'>
                     <h2 className='text-2xl text-center text-wrap'>{selectedQuestion ? selectedQuestion?.question : "Вопрос ещё не выбран"}</h2>
-                    <h2 className='text-center text-xl'>{user.username}</h2>
-                    <h2 className='text-center text-xl'>Очки: {user.points}</h2>
+                    <h2 className='text-center text-xl'>{user?.username}</h2>
+                    <h2 className='text-center text-xl'>Очки: {user?.points}</h2>
                     {
-                        selectedQuestion && <button onClick={answerQuestion} className='w-40 h-40 rounded-full text-2xl bg-green-300 p-2'>{queue.find((el: IUser) => el.username == user.username) ? "Вы уже ответили" : "Ответить"}</button>
+                        selectedQuestion && <button onClick={answerQuestion} className='w-40 h-40 rounded-full text-2xl bg-green-300 p-2'>{queue.find((el: IUser) => el.username == user?.username) ? "Вы уже ответили" : "Ответить"}</button>
                     }
                 </div>
             </div>
