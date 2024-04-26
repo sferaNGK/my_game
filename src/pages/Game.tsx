@@ -6,13 +6,8 @@ import { ITopic } from '../interface/ITopic'
 import { useLocation } from 'react-router-dom'
 import { socket } from '../socket'
 import toast from 'react-hot-toast/headless'
-import { dataGame } from '../game'
 
 const Game = () => {
-
-    window.addEventListener('beforeunload', (event) => {
-        event.preventDefault();
-    });
 
     const location = useLocation();
 
@@ -20,7 +15,7 @@ const Game = () => {
 
     const [users, setUsers] = useState<IUser[]>()
     const [queue, setQueue] = useState<IUser[]>([])
-    const [game, setGame] = useState<IGame>(dataGame)
+    const [game, setGame] = useState<IGame | []>()
 
     const [selectedQuestion, setSelectedQuestion] = useState<IQuestion | null>(null)
     const [activeUser, setActiveUser] = useState<IUser | null>()
@@ -65,17 +60,18 @@ const Game = () => {
         socket.emit("changeUser")
     }
 
-    // const getGameData = () => {
+    const getGameData = () => {
 
-    //     // @ts-ignore
-    //     const data = JSON.parse(localStorage.getItem("gamedata"))
-    //     setGame(data)
-    // }
+        // @ts-ignore
+        const data = JSON.parse(localStorage.getItem("gamedata"))
+        data.forEach(item => item.questions.sort((a, b) => a.points - b.points))
+        setGame(data)
+    }
 
     socket.on("newUserList", (users) => {
 
         if (user?.role == "user") {
-            console.log(1)
+
             const newData = users?.find((el: IUser) => el.username == user.username)
             setUser(newData)
         }
@@ -88,6 +84,8 @@ const Game = () => {
     })
 
     useEffect(() => {
+
+        getGameData()
 
         socket.emit("joinGame", {
             username: location.state?.username,
@@ -201,7 +199,7 @@ const Game = () => {
             </div>
             <div className="w-full flex-auto flex flex-col justify-between p-4">
                 {!isUser ?
-                    game?.topics.map((topic: ITopic) => (
+                    game?.map((topic: ITopic) => (
                         <div className="flex text-2xl items-center">
                             <div className="w-64">
                                 <h2>{topic.title}</h2>
