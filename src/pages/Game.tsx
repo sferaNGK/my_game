@@ -15,7 +15,7 @@ const Game = () => {
 
     const [users, setUsers] = useState<IUser[]>()
     const [queue, setQueue] = useState<IUser[]>([])
-    const [game, setGame] = useState<IGame | []>()
+    const [game, setGame] = useState<IGame>()
 
     const [selectedQuestion, setSelectedQuestion] = useState<IQuestion | null>(null)
     const [activeUser, setActiveUser] = useState<IUser | null>()
@@ -63,8 +63,9 @@ const Game = () => {
     const getGameData = () => {
 
         // @ts-ignore
-        const data = JSON.parse(localStorage.getItem("gamedata"))
-        data.forEach(item => item.questions.sort((a, b) => a.points - b.points))
+        const data = JSON.parse(localStorage.getItem("game"))
+        data.categories.forEach((item: any) => item.questions.sort((a: any, b: any) => a.points - b.points))
+        console.log(data)
         setGame(data)
     }
 
@@ -194,12 +195,12 @@ const Game = () => {
             }
 
             <div className="w-full h-auto flex justify-between border-2 p-4">
-                <h1 className="text-2xl">Своя игра</h1>
+                <h1 className="text-2xl">{game?.title}</h1>
                 <button onClick={() => { setIsUser(!isUser) }}>Таблица</button>
             </div>
             <div className="w-full flex-auto flex flex-col justify-between p-4">
                 {!isUser ?
-                    game?.map((topic: ITopic) => (
+                    game?.categories.map((topic: ITopic) => (
                         <div className="flex text-2xl items-center">
                             <div className="w-64">
                                 <h2>{topic.title}</h2>
