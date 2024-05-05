@@ -16,11 +16,11 @@
 ### Пример данных для игры
 
 ``` javascript
-const dataGame = {
+{
     // название общей темы игры
     title: "Россия",
     // Массив тем
-    topics: [
+    categoties: [
         {
             // Название полонки
             title: "География",
@@ -29,6 +29,8 @@ const dataGame = {
                 {
                     // Вопрос
                     question: "Какой город является столицей России?",
+                    // Файл
+                    question_file: null,
                     // Ответ
                     answer: "Москва",
                     // Количество очков
@@ -38,28 +40,11 @@ const dataGame = {
                 },
                 {
                     question: "Как называется самый высокий действующий вулкан в РФ?",
+                    question_file: "game.png",
                     answer: "Ключевская сопка",
                     points: 200,
                     isHidden: false,
                 },
-                {
-                    question: "Сколько среди регионов России автономных округов?",
-                    answer: 4,
-                    points: 300,
-                    isHidden: false,
-                },
-                {
-                    question: "Назовите самую северную точку России и всей Евразии.",
-                    answer: "Мыс Флигели",
-                    points: 400,
-                    isHidden: false,
-                },
-                {
-                    question: "Где находится самая низкая точка России относительно уровня моря?",
-                    answer: "Прикаспийская низменность",
-                    points: 500,
-                    isHidden: false,
-                }
             ]
         }
     ]

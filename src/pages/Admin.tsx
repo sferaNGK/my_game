@@ -40,7 +40,7 @@ const Admin = () => {
         <div className='w-full h-screen flex justify-center items-center bg-slate-300'>
             <div className='bg-white rounded-lg p-4 flex flex-col gap-y-3'>
                 <h2 className='text-center text-xl'>Своя игра</h2>
-                <select name="" onChange={(e) => handleGame(e.target.value)}>
+                <select name="" onChange={(e) => handleGame(e.target.value)} className='w-80 border-2 p-2 rounded-lg'>
                     <option value="#" selected disabled>Выберете игры</option>
                     {games?.map((game: IGame) => {
                         return (

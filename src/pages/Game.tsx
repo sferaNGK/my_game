@@ -65,7 +65,6 @@ const Game = () => {
         // @ts-ignore
         const data = JSON.parse(localStorage.getItem("game"))
         data.categories.forEach((item: any) => item.questions.sort((a: any, b: any) => a.points - b.points))
-        console.log(data)
         setGame(data)
     }
 
@@ -153,10 +152,29 @@ const Game = () => {
         <div className="w-full h-screen flex flex-col relative">
 
             {isSelect &&
-                <div className='absolute w-full h-screen bg-slate-500 z-10 flex justify-center items-center text-lg'>
+                <div className='absolute w-full h-screen bg-slate-500 z-10 flex justify-center items-center text-lg p-4'>
                     <div className="w-[600px] bg-white p-4 rounded-lg flex flex-col gap-y-3">
                         <div>
                             <h2 className='text-wrap text-center'>{selectedQuestion?.question}</h2>
+                            {
+                                selectedQuestion?.question_type == "img" && (
+                                    <img src={`http://mygame-api/public/${selectedQuestion.question_file}`} alt="" className='mx-auto rounded-lg max-w-[400px] max-h-[360px]' />
+                                )
+                            }
+                            {
+                                selectedQuestion?.question_type == "music" && (
+                                    <audio controls className='mx-auto'>
+                                        <source src={`http://mygame-api/public/${selectedQuestion.question_file}`} />
+                                    </audio>
+                                )
+                            }
+                            {
+                                selectedQuestion?.question_type == "video" && (
+                                    <video controls className='mx-auto'>
+                                        <source src={`http://mygame-api/public/${selectedQuestion.question_file}`} />
+                                    </video>
+                                )
+                            }
                         </div>
                         <div className='flex flex-col gap-y-3'>
                             {
