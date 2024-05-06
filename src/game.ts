@@ -2,182 +2,62 @@ import { IGame } from "./interface/IGame";
 
 export const dataGame: IGame = {
     id: "12",
-    title: "Россия",
-    topics: [
+    title: "Програмисты",
+    categories: [
         {
-            title: "География",
+            title: "Назад в прошлое",
             questions: [
                 {
-                    question: "Какой город является столицей России?",
-                    answer: "Москва",
+                    question: "Какое из современных устройсв современного компбютера соответвует <<складу Бэббиджа>>",
+                    question_type: "text",
+                    question_file: null,
+                    answer: "Жесткий диск",
+                    answer_type: "text",
+                    answer_file: null,
                     points: 100,
                     isHidden: false,
                 },
                 {
-                    question: "Как называется самый высокий действующий вулкан в РФ?",
-                    answer: "Ключевская сопка",
+                    question: "Как называется повторяющиеся операции в программе?",
+                    question_type: "text",
+                    question_file: null,
+                    answer: "Цикл",
+                    answer_type: "text",
+                    answer_file: null,
                     points: 200,
                     isHidden: false,
                 },
                 {
-                    question: "Сколько среди регионов России автономных округов?",
-                    answer: "4",
+                    question: "Как назывался карточки, на которых писался код для ЭВМ первого поколения?",
+                    question_type: "text",
+                    question_file: null,
+                    answer: "Перфокарты",
+                    answer_type: "text",
+                    answer_file: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/%D0%9F%D0%B5%D1%80%D1%84%D0%BE%D0%BA%D0%B0%D1%80%D1%82%D0%B0.jpg/300px-%D0%9F%D0%B5%D1%80%D1%84%D0%BE%D0%BA%D0%B0%D1%80%D1%82%D0%B0.jpg",
                     points: 300,
                     isHidden: false,
                 },
                 {
-                    question: "Назовите самую северную точку России и всей Евразии.",
-                    answer: "Мыс Флигели",
+                    question: "Чем явдядасть программа <<Elk Cloner>> написанная Ричардом Скрента",
+                    question_type: "text",
+                    question_file: null,
+                    answer: "Компьютерный вирус",
+                    answer_type: "text",
+                    answer_file: null,
                     points: 400,
                     isHidden: false,
                 },
                 {
-                    question: "Где находится самая низкая точка России относительно уровня моря?",
-                    answer: "Прикаспийская низменность",
+                    question: "Какую фразу выводил самый опачный вирус при заражении компьюера?",
+                    question_type: "text",
+                    question_file: null,
+                    answer: "I LOVE YOU",
+                    answer_type: "img",
+                    answer_file: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRVjTQ_0_q3T3IM2DtvbgZj5ain7Ali2nOnPjepW2Utg&s",
                     points: 500,
                     isHidden: false,
                 }
             ]
         },
-        {
-            title: "История",
-            questions: [
-                {
-                    question: "Какая династия стоит в основании истории России?",
-                    answer: "Рюриковичи",
-                    points: 100,
-                    isHidden: false,
-                },
-                {
-                    question: "Вокруг какого торгового пути возникли первые княжества?",
-                    answer: "Из варяг в греки",
-                    points: 200,
-                    isHidden: false,
-                },
-                {
-                    question: "Кто и когда стал первым патриархом русской православной церкви?",
-                    answer: "Патриарх Иов в 1589 году",
-                    points: 300,
-                    isHidden: false,
-                },
-                {
-                    question: "Какое княжество смогло собрата под своею рукою все остальные и образовать Русское царство?",
-                    answer: "Великое княжество Московское",
-                    points: 400,
-                    isHidden: false,
-                },
-                {
-                    question: "Просьба о помощи какого из правителей соседних земель, привела русских князей в битву на Калке 31 мая 1223 года?",
-                    answer: "Котян Сутоевич хан Половцев",
-                    points: 500,
-                    isHidden: false,
-                }
-            ]
-        },
-        {
-            title: "Литература",
-            questions: [
-                {
-                    question: "Какая фамилия была у Степана и Петра, героев романа Фёдора Достоевского «Бесы»?",
-                    answer: "Верховенские",
-                    points: 100,
-                    isHidden: false,
-                },
-                {
-                    question: "В чём схожесть повести Николая Карамзина «Бедная Лиза» и пьесы Александра Островского «Гроза» ?",
-                    answer: "Героини кончают жизнь самоубийством",
-                    points: 200,
-                    isHidden: false,
-                },
-                {
-                    question: "Этот роман, сопровождающийся стихами главного героя, был запрещён к изданию из-за отношения автора к революционным событиям 1917 года",
-                    answer: "Доктор Живаго",
-                    points: 300,
-                    isHidden: false,
-                },
-                {
-                    question: "В каком литературном жанре написано произведение Николая Лескова «Левша»?",
-                    answer: "Сказ",
-                    points: 400,
-                    isHidden: false,
-                },
-                {
-                    question: "Какой русский современный писатель является автором таких произведений как «Омон Ра», «Чапаев и Пустота» «Generation «П»?",
-                    answer: "Виктор Пелевин",
-                    points: 500,
-                    isHidden: false,
-                }
-            ]
-        },
-        {
-            title: "Спорт",
-            questions: [
-                {
-                    question: "В каком году проходили летние Олимпийские игры в СССР?",
-                    answer: "1980",
-                    points: 100,
-                    isHidden: false,
-                },
-                {
-                    question: "Символ зимних Олимпийских игр в России?",
-                    answer: "Белый мишка",
-                    points: 200,
-                    isHidden: false,
-                },
-                {
-                    question: "Самый титулованный футбольный клуб России?",
-                    answer: "Зенит",
-                    points: 300,
-                    isHidden: false,
-                },
-                {
-                    question: "В каком виде спорта была завоевана первая золотая медаль Олимпийских игр в истории России?",
-                    answer: "Фигурное катание (Николай Панин-Коломенкин в 1908 году)",
-                    points: 400,
-                    isHidden: false,
-                },
-                {
-                    question: "В каком виде спорта у России наибольшее количество золотых медалей?",
-                    answer: "Борьба",
-                    points: 500,
-                    isHidden: false,
-                }
-            ]
-        },
-        {
-            title: "Кинематограф",
-            questions: [
-                {
-                    question: "Самый кассовый фильм в снятый России (на март 2024)?",
-                    answer: "Чебурашка",
-                    points: 100,
-                    isHidden: false,
-                },
-                {
-                    question: "В каком городе провели первый киносеанс в России?",
-                    answer: "Санкт-Петербурге",
-                    points: 200,
-                    isHidden: false,
-                },
-                {
-                    question: "Какой фильм выиграл первый оскар в истории России?",
-                    answer: "Разгром немецких войск под Москвой",
-                    points: 300,
-                    isHidden: false,
-                },
-                {
-                    question: "В каком году в России выходит первый полнометражный фильм «Оборона Севастополя»?",
-                    answer: "1911",
-                    points: 400,
-                    isHidden: false,
-                },
-                {
-                    question: "первый фильм снятый на Мосфильме?",
-                    answer: "На крыльях ввысь",
-                    points: 500,
-                    isHidden: false,
-                }
-            ]
-        }
     ]
 }
