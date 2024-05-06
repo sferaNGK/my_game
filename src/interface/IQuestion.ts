@@ -3,6 +3,8 @@ export interface IQuestion {
     question_type: string,
     question_file: string | null,
     answer: string,
+    answer_type: string,
+    answer_file: string | null,
     points: number,
     isHidden: boolean,
 }

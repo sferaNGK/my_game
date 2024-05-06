@@ -21,8 +21,8 @@ const Game = () => {
     const [activeUser, setActiveUser] = useState<IUser | null>()
 
     const [isSelect, setIsSelect] = useState(false)
-
     const [isUser, setIsUser] = useState(false)
+    const [isAnswer, setIsAnswer] = useState(false)
 
     // Функции для работы с клиентом
     const showQuestion = (question: IQuestion) => {
@@ -34,8 +34,13 @@ const Game = () => {
 
     const hiddenQuestion = () => {
         setIsSelect(false)
-        setSelectedQuestion(null)
+        setIsAnswer(true)
         changeUser()
+    }
+
+    const closeQuestion = () => {
+        setSelectedQuestion(null)
+        setIsAnswer(false)
     }
 
     // Функции для работы с сервером
@@ -64,6 +69,7 @@ const Game = () => {
 
         // @ts-ignore
         const data = JSON.parse(localStorage.getItem("game"))
+        console.log(data)
         data.categories.forEach((item: any) => item.questions.sort((a: any, b: any) => a.points - b.points))
         setGame(data)
     }
@@ -75,8 +81,6 @@ const Game = () => {
             const newData = users?.find((el: IUser) => el.username == user.username)
             setUser(newData)
         }
-
-        setSelectedQuestion(null)
 
         setActiveUser(null)
         setQueue([])
@@ -210,6 +214,36 @@ const Game = () => {
                         </div>
                     </div>
                 </div>
+            }
+
+            {
+                isAnswer && (
+                    <div className='absolute w-full h-screen bg-slate-500 z-10 flex justify-center items-center text-lg p-4'>
+                        <div className="w-[600px] bg-white p-4 rounded-lg flex flex-col gap-y-3">
+                            <h2 className='text-wrap text-center'>{selectedQuestion?.answer}</h2>
+                            {
+                                selectedQuestion?.answer_type == "img" && (
+                                    <img src={`http://mygame-api/public/${selectedQuestion.answer_file}`} alt="" className='mx-auto rounded-lg max-w-[400px] max-h-[360px]' />
+                                )
+                            }
+                            {
+                                selectedQuestion?.answer_type == "music" && (
+                                    <audio controls className='mx-auto'>
+                                        <source src={`http://mygame-api/public/${selectedQuestion.answer_file}`} />
+                                    </audio>
+                                )
+                            }
+                            {
+                                selectedQuestion?.answer_type == "video" && (
+                                    <video controls className='mx-auto'>
+                                        <source src={`http://mygame-api/public/${selectedQuestion.answer_file}`} />
+                                    </video>
+                                )
+                            }
+                            <button className="w-full p-2 bg-red-300 rounded-lg" onClick={closeQuestion}>Закрыть</button>
+                        </div>
+                    </div>
+                )
             }
 
             <div className="w-full h-auto flex justify-between border-2 p-4">
