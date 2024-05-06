@@ -6,6 +6,7 @@ import { ITopic } from '../interface/ITopic'
 import { useLocation } from 'react-router-dom'
 import { socket } from '../socket'
 import toast from 'react-hot-toast/headless'
+import { dataGame } from '../game'
 
 const Game = () => {
 
@@ -15,7 +16,7 @@ const Game = () => {
 
     const [users, setUsers] = useState<IUser[]>()
     const [queue, setQueue] = useState<IUser[]>([])
-    const [game, setGame] = useState<IGame>()
+    const [game, setGame] = useState<IGame>(dataGame)
 
     const [selectedQuestion, setSelectedQuestion] = useState<IQuestion | null>(null)
     const [activeUser, setActiveUser] = useState<IUser | null>()
@@ -41,6 +42,7 @@ const Game = () => {
     const closeQuestion = () => {
         setSelectedQuestion(null)
         setIsAnswer(false)
+        socket.emit("closeQuestion")
     }
 
     // Функции для работы с сервером
@@ -89,7 +91,7 @@ const Game = () => {
 
     useEffect(() => {
 
-        getGameData()
+        // getGameData()
 
         socket.emit("joinGame", {
             username: location.state?.username,
