@@ -16,7 +16,7 @@ const Game = () => {
 
     const [users, setUsers] = useState<IUser[]>()
     const [queue, setQueue] = useState<IUser[]>([])
-    const [game, setGame] = useState<IGame>(dataGame)
+    const [game, setGame] = useState<IGame>()
 
     const [selectedQuestion, setSelectedQuestion] = useState<IQuestion | null>(null)
     const [activeUser, setActiveUser] = useState<IUser | null>()
@@ -91,7 +91,7 @@ const Game = () => {
 
     useEffect(() => {
 
-        // getGameData()
+        getGameData()
 
         socket.emit("joinGame", {
             username: location.state?.username,
@@ -143,7 +143,8 @@ const Game = () => {
         return (
             <div className='w-full h-screen flex justify-center items-center bg-slate-300 p-2'>
                 <div className='w-[800px] bg-white rounded-lg p-4 flex flex-col gap-y-3 items-center'>
-                    <h2 className='text-2xl text-center text-wrap'>{selectedQuestion ? selectedQuestion?.question : "Вопрос ещё не выбран"}</h2>
+                    <h2 className='text-wrap text-center'>Вопрос за {selectedQuestion?.points}</h2>
+                    <p className='text-lg text-center text-wrap'>{selectedQuestion ? selectedQuestion?.question : "Вопрос ещё не выбран"}</p>
                     <h2 className='text-center text-xl'>{user?.username}</h2>
                     <h2 className='text-center text-xl'>Очки: {user?.points}</h2>
                     {
@@ -161,10 +162,16 @@ const Game = () => {
                 <div className='absolute w-full h-screen bg-slate-500 z-10 flex justify-center items-center text-lg p-4'>
                     <div className="w-[600px] bg-white p-4 rounded-lg flex flex-col gap-y-3">
                         <div>
-                            <h2 className='text-wrap text-center'>{selectedQuestion?.question}</h2>
+                            <h2 className='text-wrap text-center'>Вопрос за {selectedQuestion?.points}</h2>
+                            {
+                                selectedQuestion?.desc && (
+                                    <p className='text-wrap text-center'>{selectedQuestion?.desc}</p>
+                                )
+                            }
+                            <h2 className='text-wrap text-center font-bold'>{selectedQuestion?.question}</h2>
                             {
                                 selectedQuestion?.question_type == "img" && (
-                                    <img src={`http://mygame-api/public/${selectedQuestion.question_file}`} alt="" className='mx-auto rounded-lg max-w-[400px] max-h-[360px]' />
+                                    <img src={`http://mygame-api/public/${selectedQuestion.question_file}`} alt="" className='mx-auto rounded-lg max-w-[300px] max-h-[260px] object-cover' />
                                 )
                             }
                             {
@@ -225,7 +232,7 @@ const Game = () => {
                             <h2 className='text-wrap text-center'>{selectedQuestion?.answer}</h2>
                             {
                                 selectedQuestion?.answer_type == "img" && (
-                                    <img src={`http://mygame-api/public/${selectedQuestion.answer_file}`} alt="" className='mx-auto rounded-lg max-w-[400px] max-h-[360px]' />
+                                    <img src={`http://mygame-api/public/${selectedQuestion.answer_file}`} alt="" className='mx-auto rounded-lg max-w-[300px] max-h-[260px] object-cover' />
                                 )
                             }
                             {
