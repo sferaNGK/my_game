@@ -16,7 +16,7 @@ const Game = () => {
 
     const [users, setUsers] = useState<IUser[]>()
     const [queue, setQueue] = useState<IUser[]>([])
-    const [game, setGame] = useState<IGame>()
+    const [game, setGame] = useState<IGame>(dataGame)
 
     const [selectedQuestion, setSelectedQuestion] = useState<IQuestion | null>(null)
     const [activeUser, setActiveUser] = useState<IUser | null>()
@@ -91,7 +91,7 @@ const Game = () => {
 
     useEffect(() => {
 
-        getGameData()
+        // getGameData()
 
         socket.emit("joinGame", {
             username: location.state?.username,
@@ -141,34 +141,41 @@ const Game = () => {
 
     if (user?.role == "user") {
         return (
-            <div className='w-full h-screen flex justify-center items-center bg-slate-300 p-2'>
-                <div className='w-[800px] bg-white rounded-lg p-4 flex flex-col gap-y-3 items-center'>
-                    <h2 className='text-wrap text-center'>Вопрос за {selectedQuestion?.points}</h2>
-                    <p className='text-lg text-center text-wrap'>{selectedQuestion ? selectedQuestion?.question : "Вопрос ещё не выбран"}</p>
+            <div className='w-full h-screen flex-col justify-center items-center'>
+                <div className='w-full h-1/3 flex flex-col justify-between items-center bg-background-img py-3 rounded-b-[76px]'>
+                    <h2 className='text-4xl font-bold text-center'>БИТВА <br /> РАЗУМОВ</h2>
+                    <img className='w-64' src="/public/logo-3.png" alt="" />
+                </div>
+                <div className='h-2/3 bg-white rounded-lg p-4 flex flex-col gap-y-3 items-center'>
+                    <h2 className='text-wrap text-xl text-center'>Вопрос за {selectedQuestion?.points}</h2>
+                    <p className='text-2xl font-bold text-center text-wrap'>{selectedQuestion ? selectedQuestion?.question : "Вопрос ещё не выбран"}</p>
                     <h2 className='text-center text-xl'>{user?.username}</h2>
                     <h2 className='text-center text-xl'>Очки: {user?.points}</h2>
                     {
                         selectedQuestion && <button onClick={answerQuestion} className='w-40 h-40 rounded-full text-2xl bg-green-300 p-2'>{queue.find((el: IUser) => el.username == user?.username) ? "Вы уже ответили" : "Ответить"}</button>
                     }
                 </div>
+                <div className='h-1/3'>
+                    dd
+                </div>
             </div>
         )
     }
 
     return (
-        <div className="w-full h-screen flex flex-col relative">
+        <div className="w-full h-screen flex flex-col relative bg-background-img bg-cover">
 
             {isSelect &&
-                <div className='absolute w-full h-screen bg-slate-500 z-10 flex justify-center items-center text-lg p-4'>
-                    <div className="w-[600px] bg-white p-4 rounded-lg flex flex-col gap-y-3">
+                <div className='absolute w-full h-screen z-10 flex justify-center items-center text-lg p-4 bg-background-img bg-cover'>
+                    <div className="w-[800px] bg-white p-4 rounded-lg flex flex-col gap-y-3">
                         <div>
-                            <h2 className='text-wrap text-center'>Вопрос за {selectedQuestion?.points}</h2>
+                            <h2 className='text-wrap text-center text-xl'>Вопрос за {selectedQuestion?.points}</h2>
                             {
                                 selectedQuestion?.desc && (
-                                    <p className='text-wrap text-center'>{selectedQuestion?.desc}</p>
+                                    <p className='text-wrap text-center text-xl'>{selectedQuestion?.desc}</p>
                                 )
                             }
-                            <h2 className='text-wrap text-center font-bold'>{selectedQuestion?.question}</h2>
+                            <h2 className='text-wrap text-center text-2xl font-bold'>{selectedQuestion?.question}</h2>
                             {
                                 selectedQuestion?.question_type == "img" && (
                                     <img src={`http://mygame-api/public/${selectedQuestion.question_file}`} alt="" className='mx-auto rounded-lg max-w-[300px] max-h-[260px] object-cover' />
@@ -227,9 +234,9 @@ const Game = () => {
 
             {
                 isAnswer && (
-                    <div className='absolute w-full h-screen bg-slate-500 z-10 flex justify-center items-center text-lg p-4'>
+                    <div className='absolute w-full h-screen bg-background-img z-10 flex justify-center items-center text-lg p-4'>
                         <div className="w-[600px] bg-white p-4 rounded-lg flex flex-col gap-y-3">
-                            <h2 className='text-wrap text-center'>{selectedQuestion?.answer}</h2>
+                            <h2 className='text-wrap text-center text-2xl font-bold'>{selectedQuestion?.answer}</h2>
                             {
                                 selectedQuestion?.answer_type == "img" && (
                                     <img src={`http://mygame-api/public/${selectedQuestion.answer_file}`} alt="" className='mx-auto rounded-lg max-w-[300px] max-h-[260px] object-cover' />
@@ -255,31 +262,31 @@ const Game = () => {
                 )
             }
 
-            <div className="w-full h-auto flex justify-between border-2 p-4">
-                <h1 className="text-2xl">{game?.title}</h1>
-                <button onClick={() => { setIsUser(!isUser) }}>Таблица</button>
+            <div className="w-full h-auto flex justify-between p-4">
+                <h1 className="text-3xl font-bold">{game?.title}</h1>
+                <button className='text-xl font-bold underline decoration-2' onClick={() => { setIsUser(!isUser) }}>Таблица</button>
             </div>
             <div className="w-full flex-auto flex flex-col justify-between p-4">
                 {!isUser ?
                     game?.categories.map((topic: ITopic) => (
-                        <div className="flex text-2xl items-center">
+                        <div className="flex items-center">
                             <div className="w-64">
-                                <h2>{topic.title}</h2>
+                                <h2 className='text-2xl font-bold'>{topic.title}</h2>
                             </div>
                             <div className="w-full flex justify-between">
                                 {topic.questions.map((question: IQuestion) => {
 
                                     if (!question.isHidden) {
                                         return (
-                                            <div onClick={() => { showQuestion(question) }} key={question.question} className="w-48 rounded-lg bg-slate-300 p-3 cursor-pointer">
-                                                <h2 className="text-center">{question.points}</h2>
+                                            <div onClick={() => { showQuestion(question) }} key={question.question} className="w-64 rounded-lg text-3xl bg-slate-300 py-5 cursor-pointer drop-shadow-2xl">
+                                                <h2 className="text-center text-3xl font-bold">{question.points}</h2>
                                             </div>
                                         )
                                     }
 
                                     return (
-                                        <div className="w-48 bg-slate-500 rounded-lg p-3 cursor-pointer">
-                                            <h2 className="text-center">{question.points}</h2>
+                                        <div className="w-64 bg-slate-500 rounded-lg py-5 cursor-default drop-shadow-2xl">
+                                            <h2 className="text-center text-3xl font-bold">{question.points}</h2>
                                         </div>
                                     )
                                 })}
@@ -290,9 +297,9 @@ const Game = () => {
                     <div className="w-full flex flex-col items-center gap-y-3">
                         {// @ts-ignore
                             users && [...users]?.sort((a, b) => b.points - a.points).map((user) => (
-                                <div key={user.username} className="w-[600px] drop-shadow-lg border-2 flex justify-between p-3 rounded-lg">
-                                    <h2>Имя: {user.username}</h2>
-                                    <h2>Очки: {user.points}</h2>
+                                <div key={user.username} className="w-[800px] bg-white drop-shadow-lg border-2 flex justify-between p-5 rounded-lg">
+                                    <h2 className='text-2xl'>Имя: {user.username}</h2>
+                                    <h2 className='text-2xl'>Очки: {user.points}</h2>
                                 </div>
                             ))
                         }
