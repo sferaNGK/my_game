@@ -155,9 +155,6 @@ const Game = () => {
                         selectedQuestion && <button onClick={answerQuestion} className='w-40 h-40 rounded-full text-2xl bg-green-300 p-2'>{queue.find((el: IUser) => el.username == user?.username) ? "Вы уже ответили" : "Ответить"}</button>
                     }
                 </div>
-                <div className='h-1/3'>
-                    dd
-                </div>
             </div>
         )
     }
