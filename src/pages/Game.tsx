@@ -8,9 +8,13 @@ import { socket } from '../socket'
 import toast from 'react-hot-toast/headless'
 import { dataGame } from '../game'
 
+const arr = ['первым', "вторым", 'третьим', 'четвертым', 'пятым']
+
 const Game = () => {
 
     const location = useLocation();
+
+
 
     const [user, setUser] = useState<IUser | null>(null)
 
@@ -137,27 +141,34 @@ const Game = () => {
         };
 
     }, [])
-
+     if (!user) {
+         return <h1>Loading...</h1>
+     }
 
     if (user?.role == "user") {
         return (
             <div className='w-full h-screen flex-col justify-center items-center'>
-                <div className='w-full h-1/3 flex flex-col justify-between items-center bg-background-img py-3 rounded-b-[76px]'>
-                    <h2 className='text-4xl font-bold text-center'>БИТВА <br /> РАЗУМОВ</h2>
+                <div className='w-full h-1/3 flex flex-col justify-between items-center header-bg py-3 rounded-b-[76px]'>
                     <img className='w-64' src="/public/logo-3.png" alt="" />
+                    <h2 className='text-4xl font-bold grow text-center flex items-center'>БИТВА <br /> РАЗУМОВ</h2>
                 </div>
                 <div className='h-2/3 bg-white rounded-lg p-4 flex flex-col gap-y-3 items-center'>
-                    <h2 className='text-wrap text-xl text-center'>Вопрос за {selectedQuestion?.points}</h2>
+                    {selectedQuestion?.points && (<h2 className='text-wrap text-xl text-center'>Вопрос за {selectedQuestion?.points}</h2>)}
                     <p className='text-2xl font-bold text-center text-wrap'>{selectedQuestion ? selectedQuestion?.question : "Вопрос ещё не выбран"}</p>
                     <h2 className='text-center text-xl'>{user?.username}</h2>
                     <h2 className='text-center text-xl'>Очки: {user?.points}</h2>
                     {
-                        selectedQuestion && <button onClick={answerQuestion} className='w-40 h-40 rounded-full text-2xl bg-green-300 p-2'>{queue.find((el: IUser) => el.username == user?.username) ? "Вы уже ответили" : "Ответить"}</button>
+                        selectedQuestion && !queue.find((el: IUser) => el.username == user?.username) ? <button onClick={answerQuestion} className='w-40 h-40 rounded-full text-2xl bg-green-300 p-2'>
+                             Ответить
+                            </button> : 
+                            <p>Вы отвечаете {arr[queue.findIndex(el => el.username == user?.username)]}</p>
                     }
                 </div>
             </div>
         )
     }
+    
+     
 
     return (
         <div className="w-full h-screen flex flex-col relative bg-background-img bg-cover">

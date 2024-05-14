@@ -2,7 +2,7 @@ import { IGame } from "./interface/IGame";
 
 export const dataGame: IGame = {
     id: "12",
-    title: "Програмисты",
+    title: "Программисты",
     categories: [
         {
             title: "Назад в прошлое",

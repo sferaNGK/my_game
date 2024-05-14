@@ -5,3 +5,8 @@
 * {
     font-family: "Poppins", sans-serif;
 }
+
+.header-bg{
+    border-radius: 0 0 76px 76px;
+    background-color: #85EEAB;
+}
